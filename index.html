@@ -570,21 +570,21 @@ const prScroll=()=>{if(!prAt||(!prEl&&!prRow))return;if(Math.abs(scrollY-prAt.y)
 document.addEventListener('pointerup',prEnd,true);document.addEventListener('pointercancel',prEnd,true);addEventListener('blur',()=>prEnd());addEventListener('scroll',prScroll,{passive:true});document.querySelectorAll('.hs').forEach(h=>h.addEventListener('scroll',prScroll,{passive:true}));
 
 /* —— 边缘回弹（触控板、滚轮）：滑到头继续滑，内容带阻尼跟着走；真机上用系统自带的 —— */
-function edgeBounce(){const g={axis:null,hs:null,lastT:0,lastA:0,min:0,dec:0,spent:false,s:[],raw:0};
+function edgeBounce(){const g={axis:null,hs:null,lastT:0,lastA:0,min:0,peak:0,since:0,tail:false,h:[],rise:0,spent:false,s:[],raw:0};
  /* 手指还在推才跟着走；一进入惯性或停手，立刻弹回。之后到手势结束的惯性尾巴都不再驱动，除非明显加速（手指又放上来了） */
  const release=a=>{clearTimeout(a._h);PTR.drag=false;const x=a.get(),m=a.max();if(x<0||x>m){const tg=ptrRest(a,x,m);runSpring(a,tg,0,tg<0?.012:OM_Y)}};
  const end=()=>{g.spent=true;g.min=g.lastA};
  const drive=(a,dv,inertia,e)=>{const x=a.get(),m=a.max(),over=x<0?x:x>m?x-m:0,push=(dv<0&&x<=0)||(dv>0&&x>=m-1);if(!over&&!push)return false;e.cancelable&&e.preventDefault();prEnd();if(g.spent)return true;const base=over<0||(!over&&dv<0)?0:m;
   if(inertia){end();clearTimeout(a._h);if(over)release(a);else runSpring(a,base,Math.sign(dv)*Math.min(Math.abs(dv)/16,2),OM_Y);return true}
-  runStop(a);if(a===axisY)PTR.drag=true;const D=a.D(),raw=(over?ruI(a,over,D):0)+dv;if(over&&Math.sign(raw)!==Math.sign(over)){clearTimeout(a._h);a.put(base);return true}a.put(base+ruF(a,raw,D));clearTimeout(a._h);a._h=setTimeout(()=>{end();release(a)},60);return true};
+  runStop(a);if(a===axisY)PTR.drag=true;const D=a.D(),raw=(over?ruI(a,over,D):0)+dv;if(over&&Math.sign(raw)!==Math.sign(over)){clearTimeout(a._h);a.put(base);return true}a.put(base+ruF(a,raw,D));clearTimeout(a._h);a._h=setTimeout(()=>{end();release(a)},100);return true};
  /* 横滑全程不交给浏览器：原生滚动加强制吸附会和回弹抢位置。和触摸同一段：跟手 → 带阻尼过边 → 松手吸附 */
  const rowLet=a=>{clearTimeout(a._h);end();const q=g.s;let v=0;if(q.length>1){const p=q[0],l=q[q.length-1],dt=l[0]-p[0];if(dt>0)v=(l[1]-p[1])/dt}else if(q.length===1&&Math.abs(q[0][2])>=40)v=Math.sign(q[0][2]);hsSettle(a,Math.max(-5,Math.min(5,v)))};
- const rowDrag=(a,dv,inertia)=>{if(g.spent)return;prEnd();if(inertia){rowLet(a);return}const m=a.max(),D=a.D();if(!g.s.length){const h=a.hs;h._touch=1;h.style.scrollSnapType='none';runStop(a);const c=a.get();g.raw=c<0?rubI(c,D):c>m?m+rubI(c-m,D):c}g.raw+=dv;a.put(g.raw<0?rubF(g.raw,D):g.raw>m?m+rubF(g.raw-m,D):g.raw);const now=performance.now();g.s.push([now,g.raw,dv]);while(g.s.length>2&&now-g.s[0][0]>100)g.s.shift();clearTimeout(a._h);a._h=setTimeout(()=>rowLet(a),70)};
+ const rowDrag=(a,dv,inertia)=>{if(g.spent)return;prEnd();if(inertia){rowLet(a);return}const m=a.max(),D=a.D();if(!g.s.length){const h=a.hs;h._touch=1;h.style.scrollSnapType='none';runStop(a);const c=a.get();g.raw=c<0?rubI(c,D):c>m?m+rubI(c-m,D):c}g.raw+=dv;a.put(g.raw<0?rubF(g.raw,D):g.raw>m?m+rubF(g.raw-m,D):g.raw);const now=performance.now();g.s.push([now,g.raw,dv]);while(g.s.length>2&&now-g.s[0][0]>100)g.s.shift();clearTimeout(a._h);a._h=setTimeout(()=>rowLet(a),100)};
  col.addEventListener('wheel',e=>{if(RM)return;const k=e.deltaMode===1?16:1,dx=e.deltaX*k,dy=e.deltaY*k,A=Math.max(Math.abs(dx),Math.abs(dy));if(!A)return;const now=performance.now();
-  if(now-g.lastT>90||((g.spent||g.dec>=3)&&A>g.min+2)){g.axis=null;g.dec=0;g.spent=false;g.s=[];g.min=A}else{if(A<g.lastA)g.dec++;else if(A>g.lastA)g.dec=0;g.min=Math.min(g.min,A)}
-  g.lastT=now;g.lastA=A;if(!g.axis){g.axis=Math.abs(dx)>Math.abs(dy)?'x':'y';g.hs=e.target.closest('.hs')}const inertia=g.dec>=3;
+  /* 惯性判断：离开峰值 3 帧以上、已经掉到峰值的 85% 以下。惯性尾巴里帧间会有抖动（一帧合并两个事件），所以一旦判定就保持到手势结束；只有连续变大，或者 6 帧都不再衰减，才算手指又放上来了 */const gap=now-g.lastT,tick=g.spent&&gap<400&&A<=3,flat=g.h.length>=6&&A>=3&&A>=g.h[g.h.length-6];g.rise=A>g.min+3&&A>=g.lastA?g.rise+1:0;if((gap>90&&!tick)||((g.spent||g.tail)&&(g.rise>=2||A>g.min+20||flat))){g.axis=null;g.tail=false;g.since=0;g.rise=0;g.spent=false;g.s=[];g.h=[];g.min=g.peak=A}else{g.min=Math.min(g.min,A);if(A>=g.peak){g.peak=A;g.since=0}else g.since++;if(g.peak>=14&&g.since>=3&&A<g.peak*.85)g.tail=true}g.h.push(A);if(g.h.length>8)g.h.shift()
+  g.lastT=now;g.lastA=A;if(!g.axis){g.axis=Math.abs(dx)>Math.abs(dy)?'x':'y';g.hs=e.target.closest('.hs')}const inertia=g.tail;
   if(g.axis==='x'){if(!g.hs)return;e.cancelable&&e.preventDefault();rowDrag(axisOf(g.hs),dx,inertia);return}
-  if(scrollY<axisT()-1&&!axisY.over)return;const y=axisY.get();if(!inertia||(y>=0&&y<=axisY.max()))runStop(axisY);const used=dy?drive(axisY,dy,inertia,e):false;
+  if(scrollY<axisT()-1&&!axisY.over)return;const y=axisY.get();if(!g.spent&&(!inertia||(y>=0&&y<=axisY.max())))runStop(axisY);const used=dy?drive(axisY,dy,inertia,e):false;
   /* 指针在横滑行上竖着滑：页面走，行不抢 */
   if(!used&&g.hs&&e.cancelable){e.preventDefault();scrollBy(0,dy)}},{passive:false});}
 edgeBounce();
@@ -593,7 +593,7 @@ const OM_Y=.018,OM_X=.02,DECAY=.998;
 const rubF=(x,D)=>Math.sign(x)*(1-1/(Math.abs(x)*.55/D+1))*D;
 const rubI=(y,D)=>{const a=Math.min(Math.abs(y),D*.98);return Math.sign(y)*(a/(1-a/D))/.55};
 const scFeed=document.querySelector('.feed');
-/* 纵向坐标以界面顶部为 0：手机上说明区排在界面上面，下拉到界面顶部就该是下拉刷新 */const axisT=()=>col.getBoundingClientRect().top+scrollY;const axisY={D:()=>innerHeight*.25,max:()=>Math.max(0,document.documentElement.scrollHeight-innerHeight-axisT()),cur:0,get:()=>scrollY-axisT()+axisY.over,over:0,put(x){const T=axisT(),c=Math.max(0,Math.min(axisY.max(),x)),o=x-c;scrollTo({top:c+T,behavior:'instant'});if(o!==axisY.over||o){axisY.over=o;scFeed.style.transform=Math.abs(o)<.1?'':`translateY(${(-o).toFixed(2)}px)`}if(o<=0)ptrOver(-o)}};
+/* 纵向坐标以界面顶部为 0：手机上说明区排在界面上面，下拉到界面顶部就该是下拉刷新 */const axisT=()=>col.getBoundingClientRect().top+scrollY;const axisY={D:()=>innerHeight*.25,max:()=>Math.max(0,document.documentElement.scrollHeight-innerHeight-axisT()),cur:0,get:()=>scrollY-axisT()+axisY.over,over:0,put(x){const T=axisT(),c=Math.max(0,Math.min(axisY.max(),x)),o=x-c;if(Math.abs(scrollY-(c+T))>.5)scrollTo({top:c+T,behavior:'instant'});if(o!==axisY.over||o){axisY.over=o;const on=Math.abs(o)>=.1;if(on!==scFeed._wc){scFeed._wc=on;scFeed.style.willChange=on?'transform':''}scFeed.style.transform=on?`translateY(${(-o).toFixed(2)}px)`:''}if(o<=0)ptrOver(-o)}};
 const axisOf=hs=>hs._ax||(hs._ax={D:()=>hs.clientWidth*.5,max:()=>Math.max(0,hs.scrollWidth-hs.clientWidth),over:0,hs,get(){return hs.scrollLeft+this.over},put(x){const c=Math.max(0,Math.min(this.max(),x)),o=x-c;hs.scrollLeft=c;if(o!==this.over||o){this.over=o;hs.style.transform=Math.abs(o)<.1?'':`translateX(${(-o).toFixed(2)}px)`}}});
 const hsPoints=hs=>{const k=[...hs.children].filter(c=>c.offsetWidth>4),b=k[0].offsetLeft,m=axisOf(hs).max();return [...new Set(k.map(c=>Math.min(m,c.offsetLeft-b)))]};
 function runStop(a){if(a.raf){cancelAnimationFrame(a.raf);a.raf=0}}
@@ -611,7 +611,7 @@ function touchScroller(){let sx=0,sy=0,lx=0,ly=0,lock=null,a=null,raw=0,hs=null,
  col.addEventListener('touchmove',e=>{if(e.touches.length>1)return;const t=e.touches[0];if(e.cancelable)e.preventDefault();if(!lock){const dx=Math.abs(t.clientX-sx),dy=Math.abs(t.clientY-sy);if(dx+dy<6)return;lock=dx>dy?'x':'y';a=lock==='x'?(hs?axisOf(hs):null):axisY;dragged=true;col.classList.add('dragging');prEnd();lx=t.clientX;ly=t.clientY;if(a){runStop(a);setRaw()}return}if(!a)return;const d=lock==='x'?lx-t.clientX:ly-t.clientY;lx=t.clientX;ly=t.clientY;raw+=d;if(a===axisY)PTR.drag=true;a.put(RM&&!(a===axisY&&raw<0)?Math.max(0,Math.min(a.max(),raw)):shown());const now=performance.now();samples.push([now,raw]);while(samples.length>2&&now-samples[0][0]>100)samples.shift()},{passive:false});
  const end=e=>{if(e.touches&&e.touches.length)return;PTR.drag=false;col.classList.remove('dragging');setTimeout(()=>{dragged=false},60);if(!a){return}let v=0;if(samples.length>1){const p=samples[0],q=samples[samples.length-1],dt=q[0]-p[0];if(dt>0&&performance.now()-q[0]<60)v=(q[1]-p[1])/dt}v=Math.max(-5,Math.min(5,v));const m=a.max();if(RM){a.put(a===axisY&&a.get()<0&&PTR.state==='refreshing'?-PTR.H:Math.max(0,Math.min(m,a.get())));return}
   if(lock==='x')hsSettle(a,v)
-  else{const x=a.get();if(x<0||x>m){const tg=ptrRest(a,x,m);runSpring(a,tg,tg<0?0:v,tg<0?.012:OM_Y)}else if(Math.abs(v)>.05)runFling(a,v)}};
+  else{const x=a.get();if(x<0||x>m){const tg=ptrRest(a,x,m);runSpring(a,tg,0,tg<0?.012:OM_Y)}else if(Math.abs(v)>.05)runFling(a,v)}};
  col.addEventListener('touchend',end,{passive:true});col.addEventListener('touchcancel',end,{passive:true});
  col.addEventListener('click',e=>{if(dragged){e.stopPropagation();e.preventDefault();dragged=false}},true)}
 touchScroller();
