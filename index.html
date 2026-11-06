@@ -595,8 +595,8 @@ function edgeBounce(){const g={axis:null,hs:null,lastT:0,lastA:0,min:0,peak:0,si
   g.lastT=now;g.lastA=A;if(!g.axis){g.axis=Math.abs(dx)>Math.abs(dy)?'x':'y';g.hs=e.target.closest('.hs');g.pa=false;if(g.axis==='x'){let row=false;if(g.hs){const ax=axisOf(g.hs),c=ax.get(),m=ax.max();row=dx>0?c<m-1:c>1}g.pa=!row;if(g.pa){pgGrab()}}}const inertia=g.tail;
   if(g.axis==='x'){e.cancelable&&e.preventDefault();rowDrag(g.pa?PA:axisOf(g.hs),dx,inertia);return}
   if(scrollY<axisT()-1&&!axisY.over)return;const y=axisY.get();if(!g.spent&&(!inertia||(y>=0&&y<=axisY.max())))runStop(axisY);const used=dy?drive(axisY,dy,inertia,e):false;
-  /* 指针在横滑行上竖着滑：页面走，行不抢 */
-  if(!used&&g.hs&&e.cancelable){e.preventDefault();scrollBy(0,dy)}},{passive:false});}
+  /* 竖着滑一律页面自己走，不交还给浏览器：一次手势里第一下被拦过（到底回弹），浏览器整次手势都不再滚，往回推就会粘住。指针在横滑行上竖着滑也一样：页面走，行不抢 */
+  if(!used&&e.cancelable){e.preventDefault();/* 鼠标滚轮一格 100 左右，平滑过去；触控板步子小，直接跟手 */scrollBy({top:dy,behavior:Math.abs(dy)>=50&&!RM?'smooth':'instant'})}},{passive:false});}
 edgeBounce();
 /* —— 触屏滑动：跟手、惯性、回弹是同一段运动，滑到边缘不停顿（真机上系统自带，这里给网页和预览用） —— */
 const OM_Y=.018,OM_X=.02,DECAY=.998;
