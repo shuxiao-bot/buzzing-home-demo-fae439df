@@ -208,7 +208,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,B
 .rg{position:absolute;inset:0;border-radius:inherit;padding:1px;z-index:6;pointer-events:none;background:radial-gradient(150px circle at var(--mx,50%) var(--my,50%),var(--gl,transparent),transparent 100%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:var(--ga,0)}
 /* 走势卡 */
 .cht{position:absolute;display:block;touch-action:manipulation}
-/* 精选加密卡的差多少一行：实心三角 7×5 放在 7×16 的格子里，不要底（12 号字，同仓位卡，D-2026-11-07-10）；三角到数字 3，数字到 Above / Below 4；整行一种颜色，三角跟着行色 */.fed{display:flex;align-items:center;gap:4px;height:16px;font-size:12px;line-height:16px;font-weight:550;letter-spacing:0;white-space:nowrap;transition:color .2s}.fed .tri{display:block;flex:none;margin-right:-1px}.fed .hm{color:#666;font-weight:400;margin-left:4px}
+/* 精选加密卡的差多少一行：实心三角 7×5 放在 7×16 的格子里，不要底（12 号字，同仓位卡，D-2026-11-07-10）；三角到数字 3，数字到 Above / Below 4；三角和金额绿 / 红，Above / Below 三级灰 #666（D-2026-11-07-14） */.fed{display:flex;align-items:center;gap:4px;height:16px;font-size:12px;line-height:16px;font-weight:550;letter-spacing:0;white-space:nowrap;transition:color .2s}.fed .tri{display:block;flex:none;margin-right:-1px}.fed .ab{color:#666}.fed .hm{color:#666;font-weight:400;margin-left:4px}
 [data-cd]{color:#c4282b!important}
 .tx{z-index:2;pointer-events:none}
 .tags{display:flex;gap:0;padding:4px 8px;position:sticky;top:194px;z-index:20;background:#fff;box-shadow:0 -4px 0 #fff;transition:top var(--mt) var(--me)}.col.shrunk .tags{top:66px}.tags+.vs{margin-top:0}
@@ -241,8 +241,8 @@ body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,B
    <div id="log" aria-live="off"></div></div>
   <div class="box"><h2>走势卡（这次重做）</h2><div class="tb"><table>
    <tr><td>线</td><td>端头固定在右边追新价；窗口是周期的五分之一，5m 走得快，1d 几乎只有端头在动</td></tr>
-   <tr><td>此刻点</td><td>实色 6，和直播点同一拍扩散到 16，颜色跟涨跌；断线、减少动效不扩散（D-2026-11-07-04、-08）</td></tr>
-   <tr><td>穿过目标线</td><td>线、点、差值一起 0.2 秒变色</td></tr>
+   <tr><td>此刻点</td><td>实色 6，和直播点同一拍扩散到 16，颜色跟线，用主体色（BTC 琥珀、DOGE 金）；等新一轮时线灰、不画点；减少动效不扩散（D-2026-11-07-04、-08、-14）</td></tr>
+   <tr><td>穿过目标线</td><td>线和点不变色，一直是主体色；只有差值的三角和金额换绿 / 红，Above / Below 换词（D-2026-11-07-14）</td></tr>
    <tr><td>悬停</td><td>实线竖线 + 这一点；这一刻之后的线变淡，端点藏起；卡上的现价和差值原位换成这一刻，时间放在读数旁边，线上不贴字</td></tr>
    <tr><td>倒计时</td><td>1 小时内 17:22，以上 3h 20m；一直用直播红字；直接换不滚</td></tr>
    <tr><td>换一轮</td><td>线接着走（价格没断），目标线滑到新位置，读数和键淡入；新一轮晚到时键不能按、写 —</td></tr>
@@ -542,7 +542,7 @@ const visMarkets=()=>{const out=new Set();document.querySelectorAll('[data-f]').
 let playing=true,busy=false,evAcc=0;
 
 /* —— 走势 —— */
-const UPC=[37,147,74],DNC=[217,58,58];const mix=(a,b,t)=>a.map((v,i)=>Math.round(v+(b[i]-v)*t));
+const UPC=[37,147,74],DNC=[217,58,58];/* 走势线的主体色（D-2026-11-07-14，取值见 team-table.json 的 rule.price_chart）：BTC 橙行在价格图里用琥珀；DOGE、BNB、黄金金行；ETH 蓝；SOL 紫；白银、XRP 和没归行的用墨。涨跌只写在读数上 */const LC={BTC:[184,107,0],F:[184,107,0],DOGE:[135,102,12],BNB:[135,102,12],GOLD:[135,102,12],ETH:[21,91,202],SOL:[106,59,183],SILVER:[22,22,22],XRP:[22,22,22]},INK=[22,22,22],GRY=[94,94,94];const mix=(a,b,t)=>a.map((v,i)=>Math.round(v+(b[i]-v)*t));
 const SER={btc15:{coin:'F',target:76703.36,price:76772.09,dp:2,step:1.6,win:180}};CC.forEach(c=>{const C=COIN[c.coin];SER[c.s]={coin:c.coin,target:c.target,price:c.price,dp:C.dp,step:C.step,win:c.total/5}});const NOISE={};
 Object.values(SER).forEach(s=>{s.pe=Math.max(1,Math.round(s.win/60));s.pts=[];let v=s.target-(s.price-s.target)*.25,d=0;for(let i=60;i>=0;i--){d=d*.82+(Math.random()-.5)*s.step*Math.sqrt(s.pe);v+=d*.8+(s.price-v)/(i+6);s.pts.push({t:-i*s.pe,v})}s.pts[s.pts.length-1].v=s.price;if(s.coin==='F')s.pts.forEach(q=>{q.v=s.target+Math.abs(q.v-s.target)});s.d=0;s.tShow=s.target;s.force=0});
 const fmtP=(n,dp)=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:dp,maximumFractionDigits:dp});
@@ -555,7 +555,7 @@ class ChartView{constructor(el){this.el=el;this.s=SER[el.dataset.ch];this.kind=e
   if(s.noT&&co){this.r1.textContent='Target —';this.r2.style.color='#666';this.r2.textContent='—';return}
   this.r1.textContent='Target '+fmtP(s.target,dp);
   if(co){this.r2.style.color=col;/* 涨跌用实心三角 8×6（14 号字，同榜单，D-2026-11-07-10），到数字 3；相等归 ▲ */this.r2.innerHTML=`<svg width="8" height="16" viewBox="0 0 8 16" aria-hidden="true" style="display:block;flex:none;margin-right:-1px"><path d="${up?'M4 4.6 8 10.6H0z':'M4 11.4 8 5.4H0z'}" fill="currentColor"/></svg>${fmtP(Math.abs(dv),dp)}${hv?`<span style="margin-left:auto;color:#666;font-weight:400;font-size:12px;letter-spacing:0;text-shadow:0 0 3px #fcfcfc,0 0 3px #fcfcfc,0 0 3px #fcfcfc">${hv.hms}</span>`:''}`}
-  else{/* 现价穿过目标价，整行换成另一边：箭头、颜色、Above / Below；按显示精度算相等时归 Above */const zero=Math.abs(dv)<.5*Math.pow(10,-dp),u=up||zero,c=u?'#25934a':'#d93a3a',k=(u?'u':'d')+(hv?hv.hms:'');this.r2.style.color=c;if(this._k!==k){this._k=k;this.r2.innerHTML=`<svg class="tri" width="7" height="16" viewBox="0 0 7 16" aria-hidden="true"><path d="${u?'M3.5 5.25 7 10.25H0z':'M3.5 10.75 7 5.75H0z'}" fill="currentColor"/></svg><span class="n"></span><span>${u?'Above':'Below'}</span>${hv?`<span class="hm">${hv.hms}</span>`:''}`}this.r2.querySelector('.n').textContent=fmtP(zero?0:Math.abs(dv),dp);this.feLay()}}
+  else{/* 现价穿过目标价，整行换成另一边：箭头、颜色、Above / Below；按显示精度算相等时归 Above */const zero=Math.abs(dv)<.5*Math.pow(10,-dp),u=up||zero,c=u?'#25934a':'#d93a3a',k=(u?'u':'d')+(hv?hv.hms:'');this.r2.style.color=c;if(this._k!==k){this._k=k;this.r2.innerHTML=`<svg class="tri" width="7" height="16" viewBox="0 0 7 16" aria-hidden="true"><path d="${u?'M3.5 5.25 7 10.25H0z':'M3.5 10.75 7 5.75H0z'}" fill="currentColor"/></svg><span class="n"></span><span class="ab">${u?'Above':'Below'}</span>${hv?`<span class="hm">${hv.hms}</span>`:''}`}this.r2.querySelector('.n').textContent=fmtP(zero?0:Math.abs(dv),dp);this.feLay()}}
  /* 走势挪到目标价右边：左 = 目标价那块的右边 + 12，右 16；上 61.5、高 36。画布四周多留出位置给此刻点的光圈 */
  feLay(){const W=this.el.offsetWidth,x0=16+this.r1.offsetWidth+12,w=Math.max(40,W-16-x0);if(Math.abs(w-this.w)<.5&&this._x0===x0)return;this._x0=x0;this.w=w;this.cw=w+12;this.c.style.left=x0+'px';this.c.style.width=this.cw+'px';this.c.dataset.pw=w;this.c.width=Math.round(this.cw*2);this.c.height=Math.round(this.h*2)}
  draw(now,dt){const g=this.g,W=this.w,H=this.h,S=2,s=this.s,fe=this.kind==='fe';g.setTransform(S,0,0,S,0,0);g.clearRect(0,0,this.cw,H);
@@ -564,20 +564,20 @@ class ChartView{constructor(el){this.el=el;this.s=SER[el.dataset.ch];this.kind=e
   s.tShow+=(s.target-s.tShow)*(RM?1:1-Math.pow(.85,dt/16.67));
   if(s.noT)s.tShow=this.head;let mn=Math.min(s.tShow,this.head),mx=Math.max(s.tShow,this.head);a.forEach(q=>{mn=Math.min(mn,q.v);mx=Math.max(mx,q.v)});const pad=Math.max((mx-mn)*(fe?4/17:.14),s.step*1.5);mn-=pad;mx+=pad;if(!this.hi){this.lo=mn;this.hi=mx}const rl=1-Math.pow(.85,dt/16.67);this.lo=mn<this.lo?mn:this.lo+(mn-this.lo)*rl;this.hi=mx>this.hi?mx:this.hi+(mx-this.hi)*rl;
   const Wp=W-this.ins,xOf=t=>Wp*(1-(tN-t)/s.win),topI=fe?12.5:31,botI=fe?26.5:12,yOf=v=>topI+(H-topI-botI)*(1-(v-this.lo)/Math.max(this.hi-this.lo,1e-9));
-  const goal=this.head>=s.target-.5*Math.pow(10,-s.dp)?1:0;const st=dt/(200*SLOW);this.ct=RM?goal:this.ct<goal?Math.min(goal,this.ct+st):Math.max(goal,this.ct-st);const colA=s.noT?[94,94,94]:mix(DNC,UPC,this.ct);const css=`rgb(${colA.join()})`;
+  const off=!!(M[this.el.dataset.ch]&&M[this.el.dataset.ch]._wait);/* 线、此刻点、扩散圈、读数点都用主体色，不按现价高低切绿红；没目标价也照常用主体色；断线、重连、等新一轮时线灰、不画此刻点（D-2026-11-07-14） */const colA=off?GRY:(LC[s.coin]||INK);const css=`rgb(${colA.join()})`;
   if(!s.noT){g.lineWidth=1;g.strokeStyle='#a5a5a5';g.setLineDash([3,3]);g.beginPath();const ty=Math.round(yOf(s.tShow))+.5;g.moveTo(0,ty);g.lineTo(W,ty);g.stroke();g.setLineDash([])}
   const hv=this.hoverVal();const hx=Wp,hy=yOf(this.head);const P=a.filter(q=>!(q===a[a.length-1]&&!RM)).map(q=>[xOf(q.t),yOf(q.v)]);P.push([hx,hy]);
   const stroke=()=>{g.lineWidth=fe?2:1.5;g.lineJoin='round';g.lineCap='round';g.strokeStyle=css;g.beginPath();g.moveTo(P[0][0],P[0][1]);for(let i=1;i<P.length-1;i++){g.quadraticCurveTo(P[i][0],P[i][1],(P[i][0]+P[i+1][0])/2,(P[i][1]+P[i+1][1])/2)}g.lineTo(hx,hy);g.stroke()};
   if(hv){g.save();g.beginPath();g.rect(-2,0,hv.x+2,H);g.clip();stroke();g.restore();g.save();g.beginPath();g.rect(hv.x,0,this.cw,H);g.clip();g.globalAlpha=.15;stroke();g.restore()}else stroke();
-  if(!hv){const R0=3,looping=!RM&&col.dataset.dm!=='off';if(looping){const per=2000*SLOW,x=Math.min(1,((performance.timeOrigin+now)%per)/per/.6);if(x<1){const e=Math.sin(x*Math.PI/2);g.fillStyle=`rgba(${colA.join()},${(.5*(1-e)).toFixed(3)})`;g.beginPath();g.arc(hx,hy,R0+(8-R0)*e,0,7);g.fill()}}g.fillStyle=css;g.beginPath();g.arc(hx,hy,R0,0,7);g.fill()}
-  else{const y=yOf(hv.v),gx=Math.round(hv.x)+.5;g.strokeStyle='#c8c8c8';g.lineWidth=1;g.beginPath();g.moveTo(gx,fe?topI:32);g.lineTo(gx,fe?H-botI:H-Math.max(0,botI-6));g.stroke();g.fillStyle=`rgb(${(hv.v>=s.target?UPC:DNC).join()})`;g.beginPath();g.arc(hv.x,y,4,0,7);g.fill();g.strokeStyle='#fff';g.lineWidth=2;g.stroke();this.text(hv);this._hl=true}
+  if(!hv&&off){/* 等新一轮：不画此刻点 */}else if(!hv){const R0=3,looping=!RM&&col.dataset.dm!=='off';if(looping){const per=2000*SLOW,x=Math.min(1,((performance.timeOrigin+now)%per)/per/.6);if(x<1){const e=Math.sin(x*Math.PI/2);g.fillStyle=`rgba(${colA.join()},${(.5*(1-e)).toFixed(3)})`;g.beginPath();g.arc(hx,hy,R0+(8-R0)*e,0,7);g.fill()}}g.fillStyle=css;g.beginPath();g.arc(hx,hy,R0,0,7);g.fill()}
+  else{const y=yOf(hv.v),gx=Math.round(hv.x)+.5;g.strokeStyle='#c8c8c8';g.lineWidth=1;g.beginPath();g.moveTo(gx,fe?topI:32);g.lineTo(gx,fe?H-botI:H-Math.max(0,botI-6));g.stroke();g.fillStyle=css;g.beginPath();g.arc(hv.x,y,4,0,7);g.fill();g.strokeStyle='#fff';g.lineWidth=2;g.stroke();this.text(hv);this._hl=true}
   if(!hv&&this._hl){this._hl=false;this.text()}}}
 const chViews=[...document.querySelectorAll('[data-ch]')].map(e=>new ChartView(e));
 function liveSec(){Object.keys(M).forEach(id=>{const m=M[id];if(!m.live||!m.clock)return;m._t=(m._t??rint(1,4))-1;if(m._t>0)return;if(m.sp==='nba'){set(id,'clock',CLK.nba(m.clock));m._t=rint(3,6)}else if(m.sp==='soc'){set(id,'clock',CLK.soc(m.clock));m._t=12}else m._t=1e9})}
 function chSec(){clock=Math.round(clock*1000)/1000;if(col.dataset.dm!=='off')liveSec();Object.keys(NOISE).forEach(k=>delete NOISE[k]);Object.values(SER).forEach(s=>{/* 同一个币的卡价格一起走 */if(NOISE[s.coin]==null)NOISE[s.coin]=Math.random()-.5;s.d=s.d*.82+NOISE[s.coin]*s.step;let dv=s.d;if(s.force){dv+=s.force*s.step*2.4;s.fc=(s.fc||0)+1;if(s.fc>6){s.force=0;s.fc=0}}s.price+=dv;if(Math.round(clock)%s.pe===0){s.pts.push({t:Math.round(clock),v:s.price});if(s.pts.length>125)s.pts.shift()}});chViews.forEach(v=>{if(v.hx==null)v.text()});
  Object.keys(CDT).forEach(k=>{if(M[k]&&M[k]._wait){cd[k]=0;cdPaint(k);return}cd[k]--;if(cd[k]<=0){cd[k]=CDT[k].t;newRound(k)}cdPaint(k)})}
 function cdPaint(k){const total=CDT[k].t,txt=k==='c15'?mmss(cd[k]):cdF(k);document.querySelectorAll(`[data-cd="${k}"]`).forEach(e=>{e.textContent=txt});document.querySelectorAll(`[data-rem="${k}"]`).forEach(e=>e.setAttribute('stroke-dasharray',`${cd[k]/total*100} 100`))}
-function lateRound(id){const m=M[id],card=document.querySelector(`[data-ch="${id}"]`);m._wait=1;cd[id]=1;cdPaint(id);card.querySelectorAll('.key').forEach(k=>k.classList.add('off'));card.querySelectorAll('.key .v').forEach(v=>put(v,'—'));log('到点了但新一轮还没来：倒计时停在 00:00，键不能按，数字写 —；不写 Settling。新一轮一到就接上');setTimeout(()=>{m._wait=0;cd[id]=CDT[id].t;card.querySelectorAll('.key').forEach(k=>k.classList.remove('off'));newRound(id);cdPaint(id)},3000*SLOW)}
+function lateRound(id){const m=M[id],card=document.querySelector(`[data-ch="${id}"]`);m._wait=1;cd[id]=1;cdPaint(id);card.querySelectorAll('.key').forEach(k=>k.classList.add('off'));card.querySelectorAll('.key .v').forEach(v=>put(v,'—'));log('到点了但新一轮还没来：倒计时停在 00:00，键不能按，数字写 —；线变灰、不画此刻点；不写 Settling。新一轮一到就接上');setTimeout(()=>{m._wait=0;cd[id]=CDT[id].t;card.querySelectorAll('.key').forEach(k=>k.classList.remove('off'));newRound(id);cdPaint(id)},3000*SLOW)}
 function newRound(k){const ids=CDT[k].ids;ids.forEach(id=>{const s=SER[id];if(s)s.target=s.price;const na=rint(46,54);const M0=M[id];M0.p0=na;M0.p1=100-na;['p0','p1'].forEach(p=>(INDEX.get(id+'.'+p)||[]).forEach(e=>{if(e.dataset.k==='pct')put(e,M0[p]+'%');else if(e.dataset.k==='bar')e.style.width=M0[p]+'%';else if(e.dataset.k==='mx')put(e,mxF(M0[p]))}));if(!s&&!RM)document.querySelectorAll(`[data-m="${id}"] .key .v,[data-m="${id}"] .mx`).forEach(r=>r.animate([{opacity:0},{opacity:1}],{duration:220*SLOW,easing:'ease-out'}));chViews.filter(v=>v.s===s).forEach(v=>{v.text();if(!RM)[v.r1,v.r2,v.r3].forEach(r=>r&&r.animate([{opacity:0},{opacity:1}],{duration:220*SLOW,easing:'ease-out'}));if(!RM)v.el.querySelectorAll('.key .v').forEach(r=>r.animate([{opacity:0},{opacity:1}],{duration:220*SLOW,easing:'ease-out'}))})});log('换下一轮：线接着走，目标线滑到新位置，读数和键淡入')}
 
 let last=performance.now(),secAcc=0,LSEC=null;
@@ -810,7 +810,7 @@ $('rm').addEventListener('click',()=>setTimeout(tiltKick));$('rm').setAttribute(
 $('flip').onclick=()=>{Object.values(SER).forEach(s=>{s.force=s.price>=s.target?-1:1;s.fc=0;const gap=Math.abs(s.price-s.target);s.force*=Math.max(1,gap/(s.step*6))});log('价格朝目标线另一边走，穿过时线、点、差值 0.2 秒变色')};
 $('round').onclick=()=>{Object.keys(CDT).forEach(k=>{cd[k]=CDT[k].t;newRound(k);cdPaint(k)});priceRound('pt1')};
 $('late').onclick=()=>lateRound('btc5m');
-$('not').onclick=e=>{const s0=SER.btc5m;s0.noT=!s0.noT;e.target.setAttribute('aria-pressed',s0.noT);chViews.filter(v=>v.s===s0).forEach(v=>v.text());log(s0.noT?'BTC 5m 拿不到目标价：Target 写 —，差值写 —，线和点用灰色，不画目标线':'目标价恢复')};
+$('not').onclick=e=>{const s0=SER.btc5m;s0.noT=!s0.noT;e.target.setAttribute('aria-pressed',s0.noT);chViews.filter(v=>v.s===s0).forEach(v=>v.text());log(s0.noT?'BTC 5m 拿不到目标价：Target 写 —，差值写 —，线和点照常用主体色，不画目标线':'目标价恢复')};
 $('hit').onclick=()=>hitRow('pt1',1);
 $('lead').onclick=()=>{const m=M.lalgsw,lk=m.p1>m.p0,a=lk?48:52,b=lk?52:48;document.getElementById('rkHs').scrollIntoView({block:'center',behavior:RM?'auto':'smooth'});setTimeout(()=>{set('lalgsw','p0',b);set('lalgsw','p1',a);log('领先方换人：榜单这一行的队标、名字和字色、几成、涨跌一起淡入 0.22 秒；行不换位置')},RM?0:400)};
 $('pos').onclick=posNext;
