@@ -106,12 +106,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,B
 .rm .ent:hover .ic img{transform:none}
 
 /* —— Live 点：只给直播，倒计时的点不动 —— */
-@keyframes lb{0%,100%{opacity:1}50%{opacity:.35}}
-@keyframes lr{from{transform:scale(1);opacity:.5}to{transform:scale(2.5);opacity:0}}
-.col[data-dm="breath"] .dot{animation:lb calc(2s*var(--slow)) ease-in-out infinite}
-.col[data-dm="ring"] .dot{position:relative}
-.col[data-dm="ring"] .dot::after{content:"";position:absolute;inset:0;border-radius:50%;background:inherit;animation:lr calc(3s*var(--slow)) linear infinite}
-.rm .dot,.rm .dot::after{animation:none!important}
+/* D-2026-11-07-04：点一直实色；同色圈从点的大小扩到直径 18、同时淡到 0，一轮 2 秒（扩 1.2 + 空 0.8），整页按设备时钟偶数秒起圈 */@keyframes dotRip{0%{transform:scale(.4444);opacity:.5;animation-timing-function:cubic-bezier(.61,1,.88,1)}60%,100%{transform:scale(1);opacity:0}} .dot:not(.abs){position:relative} .dot::before{content:"";position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:inherit;opacity:0;transform:scale(.4444);pointer-events:none} .col[data-dm="live"] .dot.vis::before{animation:dotRip calc(2s*var(--slow)) linear infinite} .rm .dot::before{animation:none!important;opacity:0!important}
 /* —— 卡内部件 —— */
 [data-f],[data-cd],.sc{font-variant-numeric:tabular-nums}
 .abs{position:absolute;white-space:nowrap}
@@ -125,7 +120,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,B
 .fade{overflow:hidden;white-space:nowrap;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 20px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 20px),transparent)}
 .fade2{overflow:hidden;white-space:normal;-webkit-mask:linear-gradient(#000 0 0) top/100% 50% no-repeat,linear-gradient(90deg,#000 calc(100% - 20px),transparent) bottom/100% 50% no-repeat;mask:linear-gradient(#000 0 0) top/100% 50% no-repeat,linear-gradient(90deg,#000 calc(100% - 20px),transparent) bottom/100% 50% no-repeat}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#e5383b;flex:none}
-.sig{display:inline-flex;align-items:center;gap:4px;color:#c4282b;font-weight:550}
+.sig{display:inline-flex;align-items:center;gap:6px;color:#c4282b;font-weight:550}
 .meta{display:flex;align-items:center;gap:6px;font-size:14px;line-height:20px;letter-spacing:-.006em;color:#666;height:20px;white-space:nowrap}
 .std{padding:16px;display:flex;flex-direction:column;gap:12px}
 .ttl{display:flex;gap:8px;align-items:flex-start}.ttl .tt{min-width:0;flex:1}
@@ -136,7 +131,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,B
 .nm{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;height:28px;padding-top:6px}
 .nm>span{height:16px}
 .track{height:2px;position:relative}.bar{height:2px;border-radius:2px;display:block}
-.sc{width:32px;height:28px;border-radius:6px;background:#f3f3f3;display:flex;align-items:center;justify-content:center;font-weight:550;font-size:14px;line-height:20px;letter-spacing:-.006em;flex:none}
+.sc{width:32px;height:28px;border-radius:6px;background:rgba(255,255,255,.6);box-shadow:inset 0 0 0 1px rgba(22,22,22,.08);display:flex;align-items:center;justify-content:center;font-weight:550;font-size:14px;line-height:20px;letter-spacing:-.006em;flex:none}
 .mx{width:40px;text-align:right;color:#666;flex:none}
 /* 三页的代码卡（11-06 从图改成代码，内容照 home-top-tabs 会话的 402 导出图） */.lph{display:flex;align-items:center;justify-content:space-between;padding-right:24px}.lph .h1{flex:1;min-width:0}.lph .end{font-size:14px;line-height:20px;letter-spacing:-.006em;color:#666;white-space:nowrap}
 .ttl.cen{align-items:center}.ttl.cen img{margin-top:0}.ttl .ud{font-size:14px;line-height:16px;font-weight:550;letter-spacing:-.006em;color:#666}
@@ -198,7 +193,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,B
 /* 仓位卡紧凑式（D-2026-11-06-14，工作稿板 47 8195:5366）：卡高 130；上是市场行 + 押什么，下是一对数 Cost ｜ 结果（同一个样式 Data/M Strong 14、隔 16），右端 Buzzing 水印压数字基线 */
 .pmt{left:17.5px;right:17.5px;top:17.5px;display:flex;font-size:12px;line-height:16px;color:#efefef;white-space:nowrap}.pmt .pmn{min-width:0}.pmt .pin{flex:none;white-space:pre}
 .prow{left:17.5px;right:17.5px;top:39.5px;height:26px;display:flex;align-items:center;gap:8px}.prow .plogo{width:24px;height:24px;flex:none}.prow .pnm{flex:1;min-width:0;font-size:16px;line-height:19px;font-weight:550;letter-spacing:-.011em}
-/* 状态只让点有颜色：比分字用主字色 85%，下移 2 对队名基线 */.psg{flex:none;display:flex;align-items:center;gap:4px;padding-top:2px;font-size:12px;line-height:16px;font-weight:550;color:rgba(239,239,239,.85);white-space:nowrap}
+/* 状态只让点有颜色：比分字用主字色 85%，下移 2 对队名基线 */.psg{flex:none;display:flex;align-items:center;gap:6px;padding-top:2px;font-size:12px;line-height:16px;font-weight:550;color:rgba(239,239,239,.85);white-space:nowrap}
 /* 胶囊照 Library tier=won：48×26、圆角 6，底 #052F12→#01220A 不透明，1px 内描边是角度渐变（亮 #9BEFAA 95% → #5DD47A 55% → 对面 16%） */.pchip{flex:none;position:relative;height:26px;min-width:48px;box-sizing:border-box;padding:0 8px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:16px;font-weight:550;letter-spacing:-.006em;white-space:nowrap;background:linear-gradient(#052f12,#01220a);color:#5dd47a}.pchip::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:conic-gradient(from 67deg,rgba(155,239,170,.95) 0deg,rgba(93,212,122,.55) 59deg,rgba(93,212,122,.16) 180deg,rgba(93,212,122,.55) 239deg,rgba(155,239,170,.95) 360deg);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}.pchip.gray{position:relative;border:0;padding:0 8px;color:#d3d3d3;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(0,0,0,.08)),#242424}.pchip.gray::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:conic-gradient(from 67deg,rgba(255,255,255,.34) 0deg,rgba(255,255,255,.14) 59deg,rgba(255,255,255,.05) 180deg,rgba(255,255,255,.14) 239deg,rgba(255,255,255,.34) 360deg);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 .ppr{left:17.5px;bottom:17.5px;display:flex;gap:16px;align-items:flex-start}.pcl,.pcr{display:flex;flex-direction:column}
 .pk{display:flex;align-items:center;gap:6px;font-size:12px;line-height:16px;font-weight:400;white-space:nowrap}.pcl .pk{color:#b7b7b7}.pdl{display:flex;align-items:center;gap:3px;font-weight:400;font-variant-numeric:tabular-nums}.ptri{display:block;flex:none}
@@ -242,7 +237,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,B
    <div class="ctl"><button class="b" id="late" type="button">下一轮晚到</button><button class="b" id="not" type="button" aria-pressed="false">目标价缺失</button><button class="b" id="hit" type="button">触到一档</button><button class="b" id="lead" type="button">领先方换人</button><button class="b" id="pos" type="button">仓位换状态</button></div>
    <div class="ctl"><span style="align-self:center;font-size:13px;color:var(--mute)">下拉刷新</span><button class="b" data-ptr="sonic" type="button" aria-pressed="true">声纹 · 嗡嗡</button><button class="b" data-ptr="kalshi" type="button" aria-pressed="false">Kalshi 四点（对照）</button><button class="b" id="ptrTry" type="button">试拉一次</button></div>
    <canvas id="ptrBig" aria-hidden="true" style="display:block;width:176px;height:112px;margin-top:8px;background:#fff;border-radius:8px"></canvas>
-   <div class="ctl"><span style="align-self:center;font-size:13px;color:var(--mute)">红点</span><button class="b" data-dmb="breath" type="button" aria-pressed="true">呼吸</button><button class="b" data-dmb="ring" type="button" aria-pressed="false">扩圈</button><button class="b" data-dmb="off" type="button" aria-pressed="false">不动（断线）</button></div>
+   <div class="ctl"><span style="align-self:center;font-size:13px;color:var(--mute)">直播点</span><button class="b" data-dmb="live" type="button" aria-pressed="true">扩散</button><button class="b" data-dmb="off" type="button" aria-pressed="false">断线</button></div>
    <div id="log" aria-live="off"></div></div>
   <div class="box"><h2>走势卡（这次重做）</h2><div class="tb"><table>
    <tr><td>线</td><td>端头固定在右边追新价；窗口是周期的五分之一，5m 走得快，1d 几乎只有端头在动</td></tr>
@@ -265,7 +260,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,B
    <tr><td>倍数</td><td>跟 Chance 同一次更新</td></tr>
    <tr><td>比分</td><td>滚动；足球、电竞得分格亮一次，篮球不亮</td></tr>
    <tr><td>Vol、评论数</td><td>轻滚不变色；评论来了头像推移</td></tr>
-   <tr><td>Live 点</td><td>直播一直呼吸，2 秒一次，整页同步；断线就停。倒计时的点不动</td></tr>
+   <tr><td>Live 点</td><td>点一直实色，同色圈每 2 秒从偶数秒起扩一次（扩 1.2 秒、空 0.8 秒），整页和走势此刻点同一拍；断线、减少动效不扩，屏幕外和后台暂停</td></tr>
    <tr><td>比赛时钟</td><td>服务器来新值就直接换，不滚、不本地走秒</td></tr>
    <tr><td>仓位金额</td><td>钱直接换，不滚</td></tr>
   </table></div></div>
@@ -479,7 +474,7 @@ col.innerHTML=`<header class="top"><div class="tp"><div class="sb"><img src=\"${
 
 const wrapHs=hs=>[...hs.children].forEach(c=>{if(c.classList.contains('sn'))return;const w=document.createElement('div');w.className='sn';c.replaceWith(w);w.append(c)});
 document.querySelectorAll('.hs').forEach(wrapHs);
-col.addEventListener('dragstart',e=>e.preventDefault());col.dataset.dm='breath';
+col.addEventListener('dragstart',e=>e.preventDefault());col.dataset.dm='live';
 /* —— 数字动画 —— */
 const EASE='cubic-bezier(.23,1,.32,1)';let SLOW=1,RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 if(RM)document.documentElement.classList.add('rm');
@@ -501,7 +496,7 @@ function draw(el,old,val){const k=el.dataset.k;const go=canAnim(el);const dir=va
  if(k==='pct'){const s=val+'%';go?roll(el,s,dir):put(el,s);const key=el.closest('.key');if(key)key.setAttribute('aria-label',((key.dataset.al?key.dataset.al+' ':'')+s))}
  else if(k==='bar'){(el._b||[]).forEach(a=>a.cancel());el.style.width=val+'%';if(go)el._b=[el.animate([{width:old+'%'},{width:val+'%'}],{duration:300*SLOW,easing:'cubic-bezier(0,0,.2,1)'})]}
  else if(k==='mx'){const s=mxF(val);go?roll(el,s,val>old?-1:1):put(el,s)}
- else if(k==='num'){const s=String(val);go?roll(el,s,dir):put(el,s);const sp=el.dataset.sp;if(dir>0&&['soc','esp','ice','bsb','nfl'].includes(sp)&&onScreen(el)){el.animate([{backgroundColor:el.dataset.c+'33'},{backgroundColor:el.dataset.c+'33',offset:.15},{backgroundColor:'#f3f3f3'}],{duration:1200*SLOW,easing:'ease-out'})}}
+ else if(k==='num'){const s=String(val);go?roll(el,s,dir):put(el,s);const sp=el.dataset.sp;if(dir>0&&['soc','esp','ice','bsb','nfl'].includes(sp)&&onScreen(el)){el.animate([{backgroundColor:el.dataset.c+'33'},{backgroundColor:el.dataset.c+'33',offset:.15},{backgroundColor:'rgba(255,255,255,.6)'}],{duration:1200*SLOW,easing:'ease-out'})}}
  else if(k==='vol'){const a=vk(old),b=vk(val);if(a!==b){go?roll(el,b,1):put(el,b)}}
  else if(k==='cnt'){go?roll(el,String(val),1):put(el,String(val))}
  else if(k==='clk'){put(el,val)}
@@ -569,12 +564,12 @@ class ChartView{constructor(el){this.el=el;this.s=SER[el.dataset.ch];this.kind=e
   s.tShow+=(s.target-s.tShow)*(RM?1:1-Math.pow(.85,dt/16.67));
   if(s.noT)s.tShow=this.head;let mn=Math.min(s.tShow,this.head),mx=Math.max(s.tShow,this.head);a.forEach(q=>{mn=Math.min(mn,q.v);mx=Math.max(mx,q.v)});const pad=Math.max((mx-mn)*(fe?4/17:.14),s.step*1.5);mn-=pad;mx+=pad;if(!this.hi){this.lo=mn;this.hi=mx}const rl=1-Math.pow(.85,dt/16.67);this.lo=mn<this.lo?mn:this.lo+(mn-this.lo)*rl;this.hi=mx>this.hi?mx:this.hi+(mx-this.hi)*rl;
   const Wp=W-this.ins,xOf=t=>Wp*(1-(tN-t)/s.win),topI=fe?12.5:31,botI=fe?26.5:12,yOf=v=>topI+(H-topI-botI)*(1-(v-this.lo)/Math.max(this.hi-this.lo,1e-9));
-  const goal=this.head>=s.target-.5*Math.pow(10,-s.dp)?1:0;const st=dt/(200*SLOW);this.ct=RM?goal:this.ct<goal?Math.min(goal,this.ct+st):Math.max(goal,this.ct-st);const colA=s.noT?[94,94,94]:mix(DNC,UPC,this.ct);const glowC=s.noT?[204,204,204]:mix([255,150,150],[136,237,120],this.ct);const css=`rgb(${colA.join()})`;
+  const goal=this.head>=s.target-.5*Math.pow(10,-s.dp)?1:0;const st=dt/(200*SLOW);this.ct=RM?goal:this.ct<goal?Math.min(goal,this.ct+st):Math.max(goal,this.ct-st);const colA=s.noT?[94,94,94]:mix(DNC,UPC,this.ct);const css=`rgb(${colA.join()})`;
   if(!s.noT){g.lineWidth=1;g.strokeStyle='#a5a5a5';g.setLineDash([3,3]);g.beginPath();const ty=Math.round(yOf(s.tShow))+.5;g.moveTo(0,ty);g.lineTo(W,ty);g.stroke();g.setLineDash([])}
   const hv=this.hoverVal();const hx=Wp,hy=yOf(this.head);const P=a.filter(q=>!(q===a[a.length-1]&&!RM)).map(q=>[xOf(q.t),yOf(q.v)]);P.push([hx,hy]);
   const stroke=()=>{g.lineWidth=fe?2:1.5;g.lineJoin='round';g.lineCap='round';g.strokeStyle=css;g.beginPath();g.moveTo(P[0][0],P[0][1]);for(let i=1;i<P.length-1;i++){g.quadraticCurveTo(P[i][0],P[i][1],(P[i][0]+P[i+1][0])/2,(P[i][1]+P[i+1][1])/2)}g.lineTo(hx,hy);g.stroke()};
   if(hv){g.save();g.beginPath();g.rect(-2,0,hv.x+2,H);g.clip();stroke();g.restore();g.save();g.beginPath();g.rect(hv.x,0,this.cw,H);g.clip();g.globalAlpha=.15;stroke();g.restore()}else stroke();
-  if(!hv){const R0=4,looping=!RM;if(looping){const per=3000*SLOW,k=((now+this.ph*SLOW)%per)/per;g.fillStyle=`rgba(${glowC.join()},${1-k})`;g.beginPath();g.arc(hx,hy,R0+(12-R0)*k,0,7);g.fill()}g.fillStyle=css;g.beginPath();g.arc(hx,hy,R0,0,7);g.fill()}
+  if(!hv){const R0=4,looping=!RM&&col.dataset.dm!=='off';if(looping){const per=2000*SLOW,x=Math.min(1,((performance.timeOrigin+now)%per)/per/.6);if(x<1){const e=Math.sin(x*Math.PI/2);g.fillStyle=`rgba(${colA.join()},${(.5*(1-e)).toFixed(3)})`;g.beginPath();g.arc(hx,hy,R0+(9-R0)*e,0,7);g.fill()}}g.fillStyle=css;g.beginPath();g.arc(hx,hy,R0,0,7);g.fill()}
   else{const y=yOf(hv.v),gx=Math.round(hv.x)+.5;g.strokeStyle='#c8c8c8';g.lineWidth=1;g.beginPath();g.moveTo(gx,fe?topI:32);g.lineTo(gx,fe?H-botI:H-Math.max(0,botI-6));g.stroke();g.fillStyle=`rgb(${(hv.v>=s.target?UPC:DNC).join()})`;g.beginPath();g.arc(hv.x,y,4,0,7);g.fill();g.strokeStyle='#fff';g.lineWidth=2;g.stroke();this.text(hv);this._hl=true}
   if(!hv&&this._hl){this._hl=false;this.text()}}}
 const chViews=[...document.querySelectorAll('[data-ch]')].map(e=>new ChartView(e));
@@ -585,8 +580,9 @@ function cdPaint(k){const total=CDT[k].t,txt=k==='c15'?mmss(cd[k]):cdF(k);docume
 function lateRound(id){const m=M[id],card=document.querySelector(`[data-ch="${id}"]`);m._wait=1;cd[id]=1;cdPaint(id);card.querySelectorAll('.key').forEach(k=>k.classList.add('off'));card.querySelectorAll('.key .v').forEach(v=>put(v,'—'));log('到点了但新一轮还没来：倒计时停在 00:00，键不能按，数字写 —；不写 Settling。新一轮一到就接上');setTimeout(()=>{m._wait=0;cd[id]=CDT[id].t;card.querySelectorAll('.key').forEach(k=>k.classList.remove('off'));newRound(id);cdPaint(id)},3000*SLOW)}
 function newRound(k){const ids=CDT[k].ids;ids.forEach(id=>{const s=SER[id];if(s)s.target=s.price;const na=rint(46,54);const M0=M[id];M0.p0=na;M0.p1=100-na;['p0','p1'].forEach(p=>(INDEX.get(id+'.'+p)||[]).forEach(e=>{if(e.dataset.k==='pct')put(e,M0[p]+'%');else if(e.dataset.k==='bar')e.style.width=M0[p]+'%';else if(e.dataset.k==='mx')put(e,mxF(M0[p]))}));if(!s&&!RM)document.querySelectorAll(`[data-m="${id}"] .key .v,[data-m="${id}"] .mx`).forEach(r=>r.animate([{opacity:0},{opacity:1}],{duration:220*SLOW,easing:'ease-out'}));chViews.filter(v=>v.s===s).forEach(v=>{v.text();if(!RM)[v.r1,v.r2,v.r3].forEach(r=>r&&r.animate([{opacity:0},{opacity:1}],{duration:220*SLOW,easing:'ease-out'}));if(!RM)v.el.querySelectorAll('.key .v').forEach(r=>r.animate([{opacity:0},{opacity:1}],{duration:220*SLOW,easing:'ease-out'}))})});log('换下一轮：线接着走，目标线滑到新位置，读数和键淡入')}
 
-let last=performance.now(),secAcc=0;
-function loop(n){const dt=Math.min(100,n-last);last=n;sonTick(dt);if(playing){const step=dt/SLOW;clock+=step/1000;secAcc+=step;evAcc+=step;while(secAcc>=1000){secAcc-=1000;chSec()}const gap=busy?380:900;if(evAcc>=gap){evAcc=0;const v=visMarkets();if(v.length)ev(v[rint(0,v.length-1)])}}chViews.forEach(v=>{if(onScreen(v.c))v.draw(n,playing?dt:0)});requestAnimationFrame(loop)}
+let last=performance.now(),secAcc=0,LSEC=null;
+function loop(n){const dt=Math.min(100,n-last);last=n;sonTick(dt);if(playing){const step=dt/SLOW;clock+=step/1000;secAcc+=step;evAcc+=step;if(SLOW===1){const s_=Math.floor((performance.timeOrigin+n)/1000);if(LSEC==null||s_-LSEC>3)LSEC=s_;while(LSEC<s_){LSEC++;chSec()}secAcc=0}else while(secAcc>=1000){secAcc-=1000;chSec()}const gap=busy?380:900;if(evAcc>=gap){evAcc=0;const v=visMarkets();if(v.length)ev(v[rint(0,v.length-1)])}}chViews.forEach(v=>{if(onScreen(v.c))v.draw(n,playing?dt:0)});requestAnimationFrame(loop)}
+/* 直播点：进屏才扩散；新挂上的动画起点对齐设备时钟的 2 秒整轮，所以整页、新出现的点、走势此刻点同一拍 */{const io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('vis',e.isIntersecting)));const dotSync=()=>{document.querySelectorAll('.dot').forEach(d=>{if(!d._io){d._io=1;io.observe(d)}});const P=2000*SLOW;document.getAnimations().forEach(a=>{if(a.animationName==='dotRip'&&a._s!==P){a.startTime=-(performance.timeOrigin%P);a._s=P}})};dotSync();setInterval(dotSync,250)}
 requestAnimationFrame(loop);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>chViews.forEach(v=>v.text()));
 
 /* —— 声纹：纹只在右上空白，平时淡纹，交互时亮起（来自 声纹按压原型，D-2026-11-03-15、D-2026-11-04-03） —— */
@@ -818,7 +814,7 @@ $('not').onclick=e=>{const s0=SER.btc5m;s0.noT=!s0.noT;e.target.setAttribute('ar
 $('hit').onclick=()=>hitRow('pt1',1);
 $('lead').onclick=()=>{const m=M.lalgsw,lk=m.p1>m.p0,a=lk?48:52,b=lk?52:48;document.getElementById('rkHs').scrollIntoView({block:'center',behavior:RM?'auto':'smooth'});setTimeout(()=>{set('lalgsw','p0',b);set('lalgsw','p1',a);log('领先方换人：榜单这一行的队标、名字和字色、几成、涨跌一起淡入 0.22 秒；行不换位置')},RM?0:400)};
 $('pos').onclick=posNext;
-document.querySelectorAll('[data-dmb]').forEach(b=>b.onclick=()=>{col.dataset.dm=b.dataset.dmb;document.querySelectorAll('[data-dmb]').forEach(x=>x.setAttribute('aria-pressed',x===b));log({breath:'呼吸：2 秒一次，透明度 1 ↔ 0.35，整页同步',ring:'扩圈：和走势端点同一种，3 秒',off:'不动：断线时也是这样，时钟也停'}[b.dataset.dmb])});
+document.querySelectorAll('[data-dmb]').forEach(b=>b.onclick=()=>{col.dataset.dm=b.dataset.dmb;document.querySelectorAll('[data-dmb]').forEach(x=>x.setAttribute('aria-pressed',x===b));log({live:'扩散：点一直实色，同色圈 1.2 秒扩到直径 18 并淡出，再空 0.8 秒；整页按设备时钟偶数秒一起起圈，走势此刻点同一拍',off:'断线：点保持实色，不扩散，走势此刻点也不扩，时钟也停'}[b.dataset.dmb])});
 /* 价格档：触到一档 = 这一档单独结算（推断，规则待产品确认）；看的时候不换行、不重排 */
 function hitRow(id,i){const m=M[id];if(m._hit===i)return;m._hit=i;set(id,'p'+i,100);const card=document.querySelector(`.std[data-m="${id}"]`),row=card.querySelectorAll('.rows .r')[i];row.querySelector('.key').classList.add('off');(INDEX.get(id+'.p'+i)||[]).filter(e=>e.dataset.k==='mx').forEach(e=>put(e,'—'));log(m.o[i]+'：触到了，Chance 到 100%，键不能按，倍数写 —；这一行留在原位，刷新后换成下一档')}
 const PR2={ttl:['What price will Bitcoin hit · Nov 4, 12 AM','What price will Bitcoin hit · Nov 4, 1 AM'],when:['Ends 1:00 PM','Ends 2:00 PM'],o:[['$77,000','$76,800','$76,600'],['$77,200','$77,000','$76,800']],p:[[6,28,74],[9,31,70]],vol:[121000,4200]};let prI=0;
