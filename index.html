@@ -105,8 +105,8 @@ body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,B
 }
 .rm .ent:hover .ic img{transform:none}
 
-/* —— 直播点：灯 6、圈 16，2 秒一拍（D-2026-11-07-04、-08） —— */
-/* D-2026-11-07-04：点一直实色；同色圈从点的大小扩到直径 16、同时淡到 0，一轮 2 秒（扩 1.2 + 空 0.8），整页按设备时钟偶数秒起圈 */@keyframes dotRip{0%{transform:scale(.375);opacity:.5;animation-timing-function:cubic-bezier(.61,1,.88,1)}60%,100%{transform:scale(1);opacity:0}} .dot:not(.abs){position:relative} .dot::before{content:"";position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:inherit;opacity:0;transform:scale(.375);pointer-events:none} .col[data-dm="live"] .dot.vis::before{animation:dotRip calc(2s*var(--slow)) linear infinite} .rm .dot::before{animation:none!important;opacity:0!important}
+/* —— 直播点：灯 4、圈 14；此刻点 6、圈 16，2 秒一拍（D-2026-11-07-04、-08） —— */
+/* D-2026-11-07-04：点一直实色；同色圈从点的大小扩到直径 14、同时淡到 0，一轮 2 秒（扩 1.2 + 空 0.8），整页按设备时钟偶数秒起圈 */@keyframes dotRip{0%{transform:scale(.2857);opacity:.5;animation-timing-function:cubic-bezier(.61,1,.88,1)}60%,100%{transform:scale(1);opacity:0}} .dot:not(.abs){position:relative} .dot::before{content:"";position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:inherit;opacity:0;transform:scale(.2857);pointer-events:none} .col[data-dm="live"] .dot.vis::before{animation:dotRip calc(2s*var(--slow)) linear infinite} .rm .dot::before{animation:none!important;opacity:0!important}
 /* —— 卡内部件 —— */
 [data-f],[data-cd],.sc{font-variant-numeric:tabular-nums}
 .abs{position:absolute;white-space:nowrap}
@@ -119,7 +119,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,B
 .m12{font-weight:550}
 .fade{overflow:hidden;white-space:nowrap;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 20px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 20px),transparent)}
 .fade2{overflow:hidden;white-space:normal;-webkit-mask:linear-gradient(#000 0 0) top/100% 50% no-repeat,linear-gradient(90deg,#000 calc(100% - 20px),transparent) bottom/100% 50% no-repeat;mask:linear-gradient(#000 0 0) top/100% 50% no-repeat,linear-gradient(90deg,#000 calc(100% - 20px),transparent) bottom/100% 50% no-repeat}
-.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#e5383b;flex:none}
+.dot{display:inline-block;width:4px;height:4px;border-radius:50%;background:#e5383b;flex:none}
 .sig{display:inline-flex;align-items:center;gap:6px;color:#c4282b;font-weight:550}
 .meta{display:flex;align-items:center;gap:6px;font-size:14px;line-height:20px;letter-spacing:-.006em;color:#666;height:20px;white-space:nowrap}
 .std{padding:16px;display:flex;flex-direction:column;gap:12px}
@@ -143,7 +143,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,B
 .cm{display:flex;align-items:center;gap:6px}
 .ag{width:50px;height:20px;position:relative;flex:none}.ag img{position:absolute;top:0;width:20px;height:20px;border-radius:50%;box-shadow:0 0 0 1px #fcfcfc}
 .more{font-size:14px;line-height:20px;letter-spacing:-.006em;color:#666;margin-top:-4px}
-.pill{position:relative;height:24px;width:71px;flex:none;border-radius:999px;display:flex;align-items:center;gap:6px;padding:0 9px;font-size:14px;line-height:20px;font-weight:550;letter-spacing:-.006em}
+.pill{position:relative;height:24px;width:71px;flex:none;border-radius:999px;display:flex;align-items:center;gap:6px;padding:0 10px;font-size:14px;line-height:20px;font-weight:550;letter-spacing:-.006em}
 .pill svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .key{width:76px;height:36px;flex:none;appearance:none;background:none;border:0;padding:0;cursor:pointer;position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .key.ks{width:58px;height:32px}.key.fl{flex:1;width:auto}
@@ -814,7 +814,7 @@ $('not').onclick=e=>{const s0=SER.btc5m;s0.noT=!s0.noT;e.target.setAttribute('ar
 $('hit').onclick=()=>hitRow('pt1',1);
 $('lead').onclick=()=>{const m=M.lalgsw,lk=m.p1>m.p0,a=lk?48:52,b=lk?52:48;document.getElementById('rkHs').scrollIntoView({block:'center',behavior:RM?'auto':'smooth'});setTimeout(()=>{set('lalgsw','p0',b);set('lalgsw','p1',a);log('领先方换人：榜单这一行的队标、名字和字色、几成、涨跌一起淡入 0.22 秒；行不换位置')},RM?0:400)};
 $('pos').onclick=posNext;
-document.querySelectorAll('[data-dmb]').forEach(b=>b.onclick=()=>{col.dataset.dm=b.dataset.dmb;document.querySelectorAll('[data-dmb]').forEach(x=>x.setAttribute('aria-pressed',x===b));log({live:'扩散：点一直实色，同色圈 1.2 秒扩到直径 16 并淡出，再空 0.8 秒；整页按设备时钟偶数秒一起起圈，走势此刻点同一拍',off:'断线：点保持实色，不扩散，走势此刻点也不扩，时钟也停'}[b.dataset.dmb])});
+document.querySelectorAll('[data-dmb]').forEach(b=>b.onclick=()=>{col.dataset.dm=b.dataset.dmb;document.querySelectorAll('[data-dmb]').forEach(x=>x.setAttribute('aria-pressed',x===b));log({live:'扩散：点一直实色，同色圈 1.2 秒扩到直径 14 并淡出，再空 0.8 秒；整页按设备时钟偶数秒一起起圈，走势此刻点同一拍',off:'断线：点保持实色，不扩散，走势此刻点也不扩，时钟也停'}[b.dataset.dmb])});
 /* 价格档：触到一档 = 这一档单独结算（推断，规则待产品确认）；看的时候不换行、不重排 */
 function hitRow(id,i){const m=M[id];if(m._hit===i)return;m._hit=i;set(id,'p'+i,100);const card=document.querySelector(`.std[data-m="${id}"]`),row=card.querySelectorAll('.rows .r')[i];row.querySelector('.key').classList.add('off');(INDEX.get(id+'.p'+i)||[]).filter(e=>e.dataset.k==='mx').forEach(e=>put(e,'—'));log(m.o[i]+'：触到了，Chance 到 100%，键不能按，倍数写 —；这一行留在原位，刷新后换成下一档')}
 const PR2={ttl:['What price will Bitcoin hit · Nov 4, 12 AM','What price will Bitcoin hit · Nov 4, 1 AM'],when:['Ends 1:00 PM','Ends 2:00 PM'],o:[['$77,000','$76,800','$76,600'],['$77,200','$77,000','$76,800']],p:[[6,28,74],[9,31,70]],vol:[121000,4200]};let prI=0;
