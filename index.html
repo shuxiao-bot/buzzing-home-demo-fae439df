@@ -568,14 +568,15 @@ let clock=0;
   const tN=!RM?clock:s.pts[s.pts.length-1].t;this.tNow=tN;const a=s.pts.filter(q=>q.t>=tN-s.win-s.pe*2);
   s.tShow+=(s.target-s.tShow)*(RM?1:1-Math.pow(.85,dt/16.67));
   const off=this.waiting(),noT=s.noT||off;
-  /* 纵向：线和此刻点离图上下边 4；目标线离上下边至少 10.5（不够就把范围往那边撑开） */
+  /* 纵向（11-08 收口抖动）：线和此刻点离图上下边 4；范围要撑开时立刻撑开，收回放慢（约 2 秒），价格每秒的小起伏不再让范围一收一撑；
+     目标线离上下边至少 10.5，在平滑后的范围上算（不拿原始数据推），所以一直往上走时目标线稳稳贴在 10.5 上，不来回顶 */
   let mn=this.head,mx=this.head;a.forEach(q=>{mn=Math.min(mn,q.v);mx=Math.max(mx,q.v)});if(!noT){mn=Math.min(mn,s.tShow);mx=Math.max(mx,s.tShow)}
   const E=4,span=Math.max(mx-mn,s.step*3);if(mx-mn<span){const c0=(mx+mn)/2;mn=c0-span/2;mx=c0+span/2}
-  if(!noT){const f=(10.5-E)/(H-2*E),t=s.tShow;if((mx-t)/(mx-mn)<f)mx=(t-f*mn)/(1-f);if((t-mn)/(mx-mn)<f)mn=(t-f*mx)/(1-f)}
-  if(!this.hi){this.lo=mn;this.hi=mx}const rl=1-Math.pow(.85,dt/16.67);this.lo=mn<this.lo?mn:this.lo+(mn-this.lo)*rl;this.hi=mx>this.hi?mx:this.hi+(mx-this.hi)*rl;
-  const Wp=W-this.ins,xOf=t=>Wp*(1-(tN-t)/s.win),yOf=v=>E+(H-2*E)*(1-(v-this.lo)/Math.max(this.hi-this.lo,1e-9));
+  if(!this.hi){this.lo=mn;this.hi=mx}const rl=RM?1:1-Math.pow(.992,dt/16.67);this.lo=mn<this.lo?mn:this.lo+(mn-this.lo)*rl;this.hi=mx>this.hi?mx:this.hi+(mx-this.hi)*rl;
+  let lo=this.lo,hi=this.hi;if(!noT){const f=(10.5-E)/(H-2*E),t=s.tShow;if((hi-t)/(hi-lo)<f)hi=(t-f*lo)/(1-f);if((t-lo)/(hi-lo)<f)lo=(t-f*hi)/(1-f)}
+  const Wp=W-this.ins,xOf=t=>Wp*(1-(tN-t)/s.win),yOf=v=>E+(H-2*E)*(1-(v-lo)/Math.max(hi-lo,1e-9));
   /* 线、此刻点、扩散圈、面都用币色（D-2026-11-07-14）；等新一轮时线灰、不画此刻点、不画面 */const colA=off?GRY:(LC[s.coin]||INK);const css=`rgb(${colA.join()})`;
-  const ty=noT?0:Math.round(yOf(s.tShow))+.5;
+  /* 目标虚线落在像素中线上（x.5）；贴边时理论值正好在两个像素的分界，取整会来回翻，所以加回差：差不到 0.75 不挪 */let ty=0;if(noT)this.tyS=null;else{const r=yOf(s.tShow);if(this.tyS==null||Math.abs(r-this.tyS)>.75)this.tyS=Math.floor(r)+.5;ty=this.tyS}
   const hv=this.hoverVal();const hx=Wp,hy=yOf(this.head);const P=a.filter(q=>!(q===a[a.length-1]&&!RM)).map(q=>[xOf(q.t),yOf(q.v)]);P.push([hx,hy]);
   const path=()=>{g.moveTo(P[0][0],P[0][1]);for(let i=1;i<P.length-1;i++){g.quadraticCurveTo(P[i][0],P[i][1],(P[i][0]+P[i+1][0])/2,(P[i][1]+P[i+1][1])/2)}g.lineTo(hx,hy)};
   /* 面：币色同色线性渐变，夹在线和目标线之间；线上一块、线下一块分开画，离目标线越远越浓，最浓 24%，到目标线 0 */
